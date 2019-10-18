@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>컴퓨터 상세보기</title>
+</head>
+
+<body>
+    <%for(var i=0;i<data.length; i++) { %>
+    <form action="/basket/<%= data[i].pid %>" method="POST">
+        <h2><%=data[i].pname%></h2>
+        <table>
+            <tr>
+                <td> <%=data[i].pkind%></td>
+            </tr>
+            <tr>
+                <td> 가격 : <%=data[i].pprice%></td>
+            </tr>
+            <tr>
+                <% if(sess.info.master == 0) {%>
+                <td>수량 : <input type="number" name="opamount" min="1" max="100" step="1" value="1" /></td>
+                <%}%>
+            </tr> 
+              </table>
+              <hr/> 
+              <p>상품 설명</p>  
+                   <%=data[i].pexplan%>
+                <hr>
+                <% if(sess.info) {%>
+                <% if(sess.info.master == 1) {%>
+                <a href="/delete/<%=data[i].pid%>">삭제</a>
+                <a href="/modify/<%=data[i].pid%>">수정</a>
+                <%}else{%>
+                <a href="/order/<%=data[i].pid%>">구매하기</a>
+                <input type="submit" value="장바구니">
+                <%}}}%>
+    </form>
+</body>
+
+</html>

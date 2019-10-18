@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        a:link {
+            text-decoration: none;
+        }
+
+        a:visited {
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: none;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <a href="/">ComShop</a> &nbsp;|&nbsp;
+        <%if(sess.info){%>
+        <%=sess.info.uname%>님
+        &nbsp;|&nbsp;
+        <%if(sess.info.master==0) {%>
+        <a href="/mypage/<%=sess.info.uid%>">마이페이지</a>
+        &nbsp;|&nbsp;
+        <a href="/basket/<%=sess.info.uid%>">장바구니</a>
+        <% } else { %>
+        <a href="/registCom">컴퓨터 등록하기</a>
+        <% } %>
+        <form action="/logout" method="post">
+            <button type="submit">로그아웃</button>
+        </form>
+        <% } else { %>
+        <a href="/login">로그인</a>
+        &nbsp;|&nbsp;
+        <a href="/join">회원가입</a>
+        <% } %>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>컴숍</title>
+</head>
+
+<body>
+    <h1>COMSHOP</h1>
+    <table>
+        <tr>
+            <th>모델번호</th>
+            <th>이름</th>
+            <th>가격</th>
+        </tr>
+        <tbody>
+            <%for(var i=0;i<data.length; i++) { %>
+            <tr>
+                <th><%=data[i].pid%></th>
+                <td><a href="/detail/<%=data[i].pid%>"><%=data[i].pname%></a></td>
+                <td><%=data[i].pprice%></td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"> 
+    <title>로그인</title>
+</head>
+
+<body>
+    <header>
+        <div class="wrap">
+            <div class="left">
+                <h1>로그인</h1>
+                <form action="/login" method="POST">
+                    <p>아이디<input type="text" id="uid" name="uid" style="margin-left: 20px;"></p>
+                    <p>비밀번호<input type="password" id="upw" name="upw" style="margin-left: 20px;">
+                        <input type="submit" value="로그인" /></p>
+            </div>
+            <input type="radio" name="master" value="1">관리자
+            <input type="radio" name="master" value="0">사용자<br>
+            <a href="/join">회원가입</a>
+            </form>
+            <hr>
+    </header>
+</body>
+
+</html>
