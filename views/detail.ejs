@@ -5,36 +5,57 @@
     <meta charset="UTF-8">
     <title>컴퓨터 상세보기</title>
 </head>
+<script>
+    function basket() {
+        return true;
+    }
+    function comBuy(frm) {
+        var url = document.location.href;
+        console.log(url);
+        var cut = url.split('/');
+        console.log(cut[4]);
+        frm.action = "/comBuy/" + cut[4];
+        frm.submit();
+        return true;
+    }  
+</script>
 
 <body>
     <%for(var i=0;i<data.length; i++) { %>
-    <form action="/basket/<%= data[i].pid %>" method="POST">
-        <h2><%=data[i].pname%></h2>
-        <table>
-            <tr>
-                <td> <%=data[i].pkind%></td>
-            </tr>
-            <tr>
-                <td> 가격 : <%=data[i].pprice%></td>
-            </tr>
-            <tr>
+    <form action="/basket/<%= data[i].pid %>" method="POST" onsubmit='return basket();' style="width: 100%; height: 1000px;">
+        <div style="margin: 10%;">
+            <h2 style="width: 300px;"><%=data[i].pname%></h2>
+            <hr />
+            <div style="width: 50%; float: left;">
+                <img style="margin-left:13% ;" src="/<%=data[i].pimg%>" width="300" height="300" alt="상품이미지" />
+            </div>
+            <div style="width: 50%; float: left;">
+                <h4>종류 : <%=data[i].pkind%></h4>
+
+                <h4>가격 : <%=data[i].pprice%></h4>
+
                 <% if(sess.info.master == 0) {%>
-                <td>수량 : <input type="number" name="opamount" min="1" max="100" step="1" value="1" /></td>
+                <h4>수량 : <input style="width: 200px; height: 30px;" type="number" name="opamount" min="1" max="100"
+                        step="1" value="1" /></h4>
                 <%}%>
-            </tr> 
-              </table>
-              <hr/> 
-              <p>상품 설명</p>  
-                   <%=data[i].pexplan%>
-                <hr>
+         </div>
+
+         <div style="float: left; width: 50%;">
+                <h4>상품 설명</h4>  
+                <div style=" width:400px; height: 100px; border: 1px solid black;"><p style="margin: 5px;"><%=data[i].pexplan%></p></div>
+            </div>
+            <div style="float: left; width:100%; margin-top: 20px; text-align: right;">
                 <% if(sess.info) {%>
                 <% if(sess.info.master == 1) {%>
-                <a href="/delete/<%=data[i].pid%>">삭제</a>
-                <a href="/modify/<%=data[i].pid%>">수정</a>
+                <a style="text-decoration: none; color: black;" href="/delete/<%=data[i].pid%>">삭제</a>
+                <a style="text-decoration: none; color: black;" href="/modify/<%=data[i].pid%>">수정</a>
                 <%}else{%>
-                <a href="/order/<%=data[i].pid%>">구매하기</a>
-                <input type="submit" value="장바구니">
+                <input type="submit" value="장바구니" style="margin-right: 10px; width: 200px; height: 50px; background-color:black; border-radius: 10px; border:1px solid black; font-size: 15px; color:white;">
+                <input type='button' value='구매하기' onclick='return comBuy(this.form);' style="margin-right: 40px; width: 200px; height: 50px; background-color:gray; border-radius: 10px; border:1px solid gray; font-size: 15px; color:white;">
                 <%}}}%>
+            </div>
+
+        </div>
     </form>
 </body>
 

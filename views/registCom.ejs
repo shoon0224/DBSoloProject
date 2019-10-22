@@ -2,46 +2,53 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">  
+    <meta charset="UTF-8">
     <title>컴퓨터 등록</title>
 </head>
 
 <body>
-    <h3>컴퓨터 등록</h3>
-    <form action="/registCom" method="post">
-        <table>
-            <tr>
-                <td>모델번호</td>
-                <td><input type="text" id="pid" name="pid" siez="30" maxlength="50"></td>
-            </tr>
-            <tr>
-                <td>컴퓨터 이름</td>
-                <td><input type="text" id="pname" name="pname" siez="30" maxlength="50"></td>
-            </tr>
-            <tr>
-                <td>가격</td>
-                <td><input type="text" id="pprice" name="pprice"></td>
-            </tr>
-            <tr>
-                <td>
-                    상품 종류<select id="pkind" name="pkind" size="1"
-                        style="width: 150px; height: 34px; margin-left: 47px;">
-                        <option>종류</option>
-                        <option value="컴퓨터">컴퓨터</option>
-                        <option value="노트북">노트북</option>
-                    </select>
+    <center>
+        <h3>컴퓨터 등록</h3>
+        <form action="/registCom" method="post" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <td><h3 style="margin-right: 90px;">이미지등록</h3></td>
+                    <td align=left>
+                        <input type='file' name="photo" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><h3>모델번호</h3></td>
+                    <td><input type="text" id="pid" name="pid" siez="30" maxlength="50"></td>
+                </tr>
+                <tr>
+                    <td><h3>컴퓨터 이름</h3></td>
+                    <td><input type="text" id="pname" name="pname" siez="30" maxlength="50"></td>
+                </tr>
+                <tr>
+                    <td><h3>가격</h3></td>
+                    <td><input type="text" id="pprice" name="pprice"></td>
+                </tr>
+                <tr>
+                    <td><h3>상품 종류</h3></td>
+                    <td><select id="pkind" name="pkind" size="1">
+                            <option>종류</option>
+                            <option value="컴퓨터">컴퓨터</option>
+                            <option value="노트북">노트북</option>
+                        </select>
+                    </td>
+                </tr>
+                <td><h3>상품설명</h3></td>
+                <td align=left>
+                    <textarea id="pexplan" name="pexplan" cols=65 rows=15></textarea>
                 </td>
-            </tr>
-            <td width=200 align=center>상품설명</td>
-            <td align=left>
-                <textarea id="pexplan" name="pexplan" cols=65 rows=15></textarea>
-            </td>
 
-            <tr>
-                <td><input type="submit" value="생성"></td>
-            </tr>
-        </table>
-    </form>
+                <tr>
+                    <td><input style="width: 100px; height: 30px; background-color:black; border-radius: 10px; border:1px solid black; font-size: 15px; color:white;" type="submit" value="생성"></td>
+                </tr>
+            </table>
+        </form>
+    </center>
 </body>
 
 </html>

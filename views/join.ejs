@@ -7,39 +7,52 @@
 </head>
 
 <body>
-    <h3>회원가입</h3>
-    <form action="http://localhost:3000/join" method="post">
-        <table>
-            <tr>
-                <td>아이디 : </td>
-                <td><input type="text" id="uid" name="uid"></td>
-            </tr>
-            <tr>
-                <td>비밀번호 : </td>
-                <td><input type="password" id="upw" name="upw"></td>
-            </tr>
-            <tr>
-                <td>이름 : </td>
-                <td><input type="text" id="uname" name="uname"></td>
-            </tr>
-            <tr>
-                <td>주소 : </td>
-                <td><input type="text" id="uaddress" name="uaddress"></td>
-            </tr>
-            <tr>
-                <td>
-                    <select id="master" name="master" size="1" style="width: 150px; height: 34px; margin-left: 47px;">
-                        <option>선택</option>
-                        <option value="1">관리자</option>
-                        <option value="0">사용자</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="submit" value="생성"></td>
-            </tr>
-        </table>
-    </form>
+    <center>
+        <div style="margin-top: 70px; margin-bottom: 40px;">
+            <h1>회원가입</h1>
+            <form action="/join" method="post">
+                <table>
+                    <tr >
+                        <td>
+                            <h3  style="margin-right: 100px;">아이디</h3>
+                        </td>
+                        <td><input style="width: 250px; height: 30px;" type="text" id="uid" name="uid"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3>비밀번호</h3>
+                        </td>
+                        <td><input style="width: 250px; height: 30px;" type="password" id="upw" name="upw"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3>이름</h3>
+                        </td>
+                        <td><input style="width: 250px; height: 30px;" type="text" id="uname" name="uname"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3>주소</h3>
+                        </td>
+                        <td><input style="width: 250px; height: 30px;" type="text" id="uaddress" name="uaddress"></td>
+                    </tr>
+                    <tr>
+                        <td><h3>종류</h3></td>
+                        <td>
+                            <select style="width: 250px; height: 30px;" id="master" name="master" size="1" style="margin-left: 60px;">
+                                <option>선택</option>
+                                <option value="1">관리자</option>
+                                <option value="0">사용자</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><input style=" width: 200px; height: 30px; background-color:black; border-radius: 10px; border:1px solid black; font-size: 15px; color:white;" type="submit" value="생성"></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </center>
 </body>
 
 </html>

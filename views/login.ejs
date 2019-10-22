@@ -2,25 +2,31 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
     <title>로그인</title>
 </head>
 
 <body>
     <header>
-        <div class="wrap">
-            <div class="left">
+        <center>
+            <div style="margin-top: 70px; margin-bottom: 40px;">
                 <h1>로그인</h1>
                 <form action="/login" method="POST">
-                    <p>아이디<input type="text" id="uid" name="uid" style="margin-left: 20px;"></p>
-                    <p>비밀번호<input type="password" id="upw" name="upw" style="margin-left: 20px;">
-                        <input type="submit" value="로그인" /></p>
+                    <h2>아이디<input style="margin-left: 200px; width: 300px; height: 30px;" type="text" id="uid"
+                            name="uid" style="margin-left: 20px;"></h2>
+                    <h2>비밀번호<input style="margin-left: 180px; width: 300px; height: 30px; " type="password" id="upw"
+                            name="upw" style="margin-left: 20px;"></h2>
+                    <input
+                        style="width: 200px; height: 30px; background-color:black; border-radius: 10px; border:1px solid black; font-size: 15px; color:white;"
+                        type="submit" value="로그인" />
             </div>
             <input type="radio" name="master" value="1">관리자
             <input type="radio" name="master" value="0">사용자<br>
-            <a href="/join">회원가입</a>
+            <a style="text-decoration: none; color: black;" href="/join">
+                <h3 style="margin-top: 50px; color:cadetblue;">회원가입</h3>
+            </a>
             </form>
-            <hr>
+        </center>
     </header>
 </body>
 
