@@ -88,6 +88,8 @@ router.get('/detail/:pid', function (req, res, next) { //상품 상세보기
   })
 });
 
+
+
 router.get('/delete/:pid', function (req, res, next) { //삭제 역할
   var pid = req.params.pid;
   pool.getConnection((err, conn) => {
@@ -96,6 +98,32 @@ router.get('/delete/:pid', function (req, res, next) { //삭제 역할
     }
     console.log("DB Connection");
     var sql = "delete from products where pid = ?";
+    conn.query(sql, [pid], function (err, result) {
+      conn.release();
+      if (err) {
+        throw err;
+      }
+      if (result) {
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        res.write("<script>alert('삭제가 완료되었습니다.');location.href='/';</script>")
+      }
+      else {
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        res.write("<script>alert('삭제가 되지 않았습니다.');history.back();</script>")
+      }
+    });
+  })
+});
+
+
+router.get('/bdelete/:pid', function (req, res, next) { //장바구니 삭제 역할
+  var pid = req.params.pid;
+  pool.getConnection((err, conn) => {
+    if (err) {
+      throw err;
+    }
+    console.log("DB Connection");
+    var sql = "delete from basket where products_pid = ?";
     conn.query(sql, [pid], function (err, result) {
       conn.release();
       if (err) {
@@ -418,67 +446,71 @@ router.get('/modify/:pid', function (req, res, next) { //수정하기화면 불�
 });
 
 
-// router.get('/cartOrder', function (req, res, next) { 장바구니 주문 미완성
-//   var sess = req.session;
-//   pool.getConnection((err, conn) => {
-//     if (err) {
-//       throw err;
-//     }
-//     var sql = "select book.b_title, book.b_price, cart_book.c_amount from book,cart_book where cart_book.book_b_num=book.b_num and cart_book.user_id=? AND cart_book.user_cart=? "
-//     conn.query(sql, [sess.info.id, sess.info.cart], function (err, row) {
-//       if (err) {
-//         throw err;
-//       }
-//       console.log(row)
-//       res.render('index', { page: './sub/cartOrder.ejs', data: row, sess: sess });
-//     });
-//   })
-// });
-// router.post('/cartOrder', function (req, res, next) {
-//   var sess = req.session;
-//   pool.getConnection((err, conn) => {
-//     if (err) {
-//       throw err;
-//     }
-//     var sql = 'insert into orders(o_num, o_date, o_price, o_address, o_name, o_tel, o_card, user_id, user_cart) values(null, now(), ?, ?, ?, ?, ?, ?, ?)';
-//     conn.query(sql, [req.body.o_price, req.body.o_address, req.body.o_name, req.body.o_tel, req.body.o_card, sess.info.id, sess.info.cart], function (err, row) {
-//       if (err) {
-//         throw err;
-//       }
-//       else {
-//         var sql = "SELECT LAST_INSERT_ID()";
-//         conn.query(sql, function (err, row) {
-//           if (err) {
-//             throw err;
-//           }
-//           if (row.length !== 0) {
-//             var sql = "insert into orders_has_book(orders_o_num, book_b_num, o_amount) select LAST_INSERT_ID(), cart_book.book_b_num, cart_book.c_amount from cart_book where cart_book.user_id=? AND cart_book.user_cart=?";
-//             conn.query(sql, [sess.info.id, sess.info.cart], function (err, result) {
-//               if (err) {
-//                 throw err;
-//               }
-//               if (result) {
-//                 var sql = "delete from cart_book where user_id=? and user_cart = ?";
-//                 conn.query(sql, [sess.info.id, sess.info.cart], function (err, result) {
-//                   if (err) {
-//                     throw err;
-//                   }
-//                   if (result) {
-//                     sess.info = row[0];
-//                     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-//                     res.write("<script>alert('주문이 완료되었습니다.');location.href='/';</script>")
-//                   } else {
-//                     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-//                     res.write("<script>alert('주문을 실패했습니다.');history.back();</script>")
-//                   }
-//                 });
-//               }
-//             })
-//           }
-//         });
-//       }
-//     });
-// })});//받는 데이터
+router.get('/border', function (req, res, next) { //장바구니 주문
+  var sess = req.session;
+  pool.getConnection((err, conn) => {
+    if (err) {
+      throw err;
+    }
+    var sql = "select products.pname, products.pprice, basket.bamount from products,basket where basket.products_pid=products.pid and basket.user_uid=? AND basket.user_cart=? "
+    conn.query(sql, [sess.info.uid, sess.info.cart], function (err, row) {
+      conn.release();
+      if (err) {
+        throw err;
+      }
+      console.log(row)
+      res.render('index', { page: './order.ejs', data: row, sess: sess });
+    });
+  })
+});
+
+
+router.post('/border', function (req, res, next) {
+  var sess = req.session;
+  pool.getConnection((err, conn) => {
+    if (err) {
+      throw err;
+    }
+    var sql = 'insert into orders(oid, oday, oprice, oaddress, oname, otel, ocard, user_uid, user_cart) values(null, now(), ?, ?, ?, ?, ?, ?, ?)';
+    conn.query(sql, [req.body.oprice, req.body.oaddress, req.body.oname, req.body.otel, req.body.ocard, sess.info.uid, sess.info.cart], function (err, row) {
+      conn.release();
+      if (err) {
+        throw err;
+      }
+      else {
+        var sql = "SELECT LAST_INSERT_ID()";
+        conn.query(sql, function (err, row) {
+          if (err) {
+            throw err;
+          }
+          if (row.length !== 0) {
+            var sql = "insert into products_has_orders(orders_oid, products_pid, oamount) select LAST_INSERT_ID(), basket.products_pid, basket.bamount from baskter where basket.user_uid=? AND basket.user_cart=?";
+            conn.query(sql, [sess.info.uid, sess.info.cart], function (err, result) {
+              if (err) {
+                throw err;
+              }
+              if (result) {
+                var sql = "delete from basket where user_uid=? and user_cart = ?";
+                conn.query(sql, [sess.info.uid, sess.info.cart], function (err, result) {
+                  if (err) {
+                    throw err;
+                  }
+                  if (result) {
+                    sess.info = row[0];
+                    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                    res.write("<script>alert('주문이 완료되었습니다.');location.href='/';</script>")
+                  } else {
+                    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                    res.write("<script>alert('주문을 실패했습니다.');history.back();</script>")
+                  }
+                });
+              }
+            })
+          }
+        });
+      }
+    });
+})});//받는 데이터
 
 
 router.post('/modify/:pid', function (req, res, next) { //수정하기
