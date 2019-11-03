@@ -9,11 +9,11 @@
 
 <body>
     <center>
-            
+
         <div style="width: 100%; height: 1000px;">
             <h1 style="text-align: center;">장바구니</h1>
             <hr />
-            
+
             <table style="border-bottom: 1px solid black;">
                 <tr>
                     <th style="width: 20%; text-align: center;">상품이미지</th>
@@ -24,7 +24,7 @@
                     <th style="width: 5%;text-align: center;"></th>
                 </tr>
                 <tbody>
-                        
+
                     <%for(var i=0; i<data.length; i++) { %>
                     <tr>
                         <td><a href="/detail/<%=data[i].pid%>"><img
@@ -42,15 +42,15 @@
                         <td style="text-align: center; border-right: 1px solid black; border-top: 1px solid black;">
                             <a style="text-decoration: none; color: black;" href="/bdelete/<%=data[i].pid%>">삭제</a></td>
                     </tr>
-                
+
                     <% } %>
-                   
+
                 </tbody>
             </table>
             <a style="text-decoration: none; color: black;" href="/border%>">구매하기</a></td>
-            
-            
-                
+
+
+
         </div>
     </center>
 

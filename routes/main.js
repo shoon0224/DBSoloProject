@@ -49,6 +49,14 @@ router.get('/login', function (req, res, next) {//로그인화면
   res.render('index', { page: './login', sess: sess })
 });
 
+router.get('/rating/:pid/:oid', function (req, res, next) {//평점화면
+  var sess = req.session;
+  var pid=req.params.pid;
+  var oid=req.params.oid;
+  
+  res.render('index', { page: './rating',pid:pid,oid:oid, sess: sess })
+});
+
 router.get('/join', function (req, res, next) { // 회원가입화면
   var sess = req.session
   res.render('index', { page: './join', sess: sess })
@@ -77,7 +85,7 @@ router.get('/detail/:pid', function (req, res, next) { //상품 상세보기
       throw err;
     }
     console.log("DB Connection");
-    var sql = "select pname, pprice, pkind, pexplan, pid, pimg from products where pid = ?"
+    var sql = "select pname, pprice, pkind, pexplan, pid, pimg, prate from products where pid = ?"
     conn.query(sql, [pid], function (err, row) {
       conn.release();
       if (err) {
@@ -177,13 +185,13 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
   var sess = req.session;
   var pid = req.params.pid;
   var opamount = req.body.opamount;
-  var upprice = req.body.upprice;
+  
   pool.getConnection(function (err, conn) {
     if (err) {
       throw err;
     }
     var sql = 'insert into orders(oid, oday, oprice, oaddress, oname, ocard, otel, user_uid, user_cart) values(null, now(), ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [req.body.oprice, req.body.oaddress,req.body.oname, req.body.otel, req.body.ocard, sess.info.uid, sess.info.cart], function (err, row) {
+    conn.query(sql, [req.body.oprice, req.body.oaddress, req.body.oname, req.body.otel, req.body.ocard, sess.info.uid, sess.info.cart], function (err, row) {
       if (err) {
         throw err;
       }
@@ -194,30 +202,56 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
             throw err;
           }
           if (row.length !== 0) {
-              var sql = "insert into products_has_orders(orders_oid, products_pid, opamount), user(upprice) values( LAST_INSERT_ID(), ?, ?,?)";
-              conn.query(sql, [ pid, opamount, oprice], function (err, result) {
-                conn.release();
-                if (err) {
-                  throw err;
-                }
-                if (result) {
-                  sess.info = row[0];
-                  res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-                  res.write("<script>alert('주문이 완료되었습니다.');location.href='/';</script>")
-                }
-                else {
-                  res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-                  res.write("<script>alert('주문을 실패했습니다.');history.back();</script>")
-                }
+            var sql = "insert into products_has_orders(orders_oid, products_pid, opamount) values( LAST_INSERT_ID(), ?, ?)";
+            conn.query(sql, [pid,opamount], function (err, result){
+              if (err) {
+                throw err;
+              }
+              if(result){
+                var sql = "select sum(oprice) as sum from orders where user_uid=?"
+                conn.query(sql,[sess.info.uid], function(err, row){
+                  if(err){
+                    throw err;
+                  }
+                  if(row[0].sum >= 5000000 && row[0].sum < 10000000){
+                    var sql = "update user set urate = 'silver' where uid = ?"
+                    conn.query(sql,[sess.info.uid], function(err, row){
+                      if(err){
+                        throw err;
+                      }
+                      if (result) {
+                        sess.info = row[0];
+                        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                        res.write("<script>alert('주문이 완료되었습니다.');location.href='/';</script>")
+                      }
+                    });
+                  }
+                  if(row[0].sum >= 10000000){
+                    var sql = "update user set urate = 'vip' where uid = ?"
+                    conn.query(sql,[sess.info.uid], function(err, row){
+                      if(err){
+                        throw err;
+                      }
+                      if (result) {
+                        sess.info = row[0];
+                        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                        res.write("<script>alert('주문이 완료되었습니다.');location.href='/';</script>")
+                      }
+                    })
+                  }
               });
-            
+            }
+              else {
+                res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                res.write("<script>alert('주문을 실패했습니다.');history.back();</script>")
+              }
+            });
           }
         })
       }
     });
   })
 });//받는 데이터}
-
 
 
 
@@ -244,7 +278,97 @@ router.get('/mypage', function (req, res, next) { //마이페이지 불러오기
 });
 
 
+router.post('/rating/:pid/:oid', function(req, res, next){ //평점주기
+  var sess = req.session;
+  var pid = req.params.pid;
+  var oid = req.params.oid;
 
+  pool.getConnection((err, conn) => {
+    if (err) {
+      throw err;
+    }
+    console.log("DB Connection");
+    var sql = "select porate from products_has_orders where orders_oid=? AND products_pid =?";
+    conn.query(sql, [oid, pid], function (err, row) {
+      if (err) {
+        throw err;
+      }
+      if(row[0].porate == null){
+        var sql = "update products_has_orders set porate=? where products_pid=? AND orders_oid =?";
+        conn.query(sql,[req.body.porate, pid, oid], function(err, row){
+          if(err){
+            throw err;
+          }
+          if(row){
+            var sql = "update products set prate = (SELECT AVG(porate) FROM products_has_orders where products_pid=?) where pid=?  "
+            conn.query(sql, [pid,pid], function (err, row) {
+              conn.release();
+              if (err) {
+                throw err;
+              }
+              if (row) {
+                sess.info = row[0];
+                res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                res.write("<script>alert('평점이 등록되었습니다.');location.href='/';</script>")
+              }
+
+            })
+          }
+
+        })
+      }
+      else {
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        res.write("<script>alert('이미 평점을 등록하셨습니다.');history.back();</script>")
+      }
+    })
+  })
+})
+
+router.post('/refund/:oid', function (req, res, next) { //환불하기
+  var sess = req.session;
+  var oid = req.params.oid;
+  pool.getConnection((err, conn) => {
+    if (err) {
+      throw err;
+    }
+    console.log("DB Connection");
+
+    var sql = "insert into refund(orders_oid,orders_pid,orders_oday,orders_oprice,orders_oamount,user_uid) select orders.oid,products_has_orders.products_pid,orders.oday,orders.oprice,products_has_orders.opamount,orders.user_uid from orders,products_has_orders where orders.oid=? and products_has_orders.orders_oid=?";
+    conn.query(sql, [oid, oid], function (err, result) {
+      if (err) {
+        throw err;
+      }
+      if (result) {
+        var sql = "delete from products_has_orders where orders_oid= ?";
+        conn.query(sql, [oid], function (err, result) {
+          if (err) {
+            throw err;
+          }
+          if (result) {
+            if (result) {
+              var sql = "delete from orders where oid=?";
+              conn.query(sql, [oid], function (err, result) {
+                if (err) {
+                  throw err;
+                }
+                if (result) {
+                  res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                  res.write("<script>alert('환불이 완료되었습니다.');location.href='/';</script>")
+                }
+              })
+            }
+
+          }
+        })
+      }
+      else {
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        res.write("<script>alert('환불을 실패했습니다.');history.back();</script>")
+      }
+    });
+  })
+});
 
 
 
@@ -301,7 +425,7 @@ router.get('/basket', function (req, res, next) {// 장바구니 불러오기
     }
     console.log("DB Connection");
     var sql = "select basket.*, products.* from basket, products where basket.products_pid=products.pid and basket.user_uid=? AND basket.user_cart=?";
-    conn.query(sql, [sess.info.uid, sess.info.cart], function (err,row) {
+    conn.query(sql, [sess.info.uid, sess.info.cart], function (err, row) {
       conn.release();
       if (err) {
         throw err;
@@ -331,7 +455,7 @@ router.post('/join', function (req, res, next) {//회원가입 SQL
 
       }
       if (row.length === 0) {
-        var sql = "insert into user values (?, ?, ?, ?,null,?)";
+        var sql = "insert into user values (?, ?, ?, ?,null,?,'bronze')";
         conn.query(sql, [req.body.uid, req.body.upw, req.body.uname, req.body.uaddress, req.body.master], function (err, row) {
           conn.release();
           if (err) {
@@ -353,7 +477,7 @@ router.post('/inquire', function (req, res, next) { //검색
   pool.getConnection((err, conn) => {
     if (err) {
       throw err;
-    } 
+    }
     var sql = "select pname, pkind, pprice, pexplan, pid, pimg from products where pname like concat('%', ?, '%') "
     conn.query(sql, [req.body.inquire], function (err, row) {
       conn.release();
@@ -365,22 +489,6 @@ router.post('/inquire', function (req, res, next) { //검색
   })
 })
 
-// router.post('/inquire', function (req, res, next) { //카테고리 검색 미완성
-//   var sess = req.session;
-//   pool.getConnection((err, conn) => {
-//     if (err) {
-//       throw err;
-//     } 
-//     var sql = "select pname, pkind, pprice, pexplan, pid, pimg from products where pname like concat('%', ?, '%') "
-//     conn.query(sql, [req.body.inquire], function (err, row) {
-//       conn.release();
-//       if (err) {
-//         throw err;
-//       }
-//       res.render('index', { page: './main', data: row, sess: sess })
-//     })
-//   })
-// })
 
 
 
@@ -459,13 +567,13 @@ router.get('/border', function (req, res, next) { //장바구니 주문
         throw err;
       }
       console.log(row)
-      res.render('index', { page: './order.ejs', data: row, sess: sess });
+      res.render('index', { page: './border.ejs', data: row, sess: sess });
     });
   })
 });
 
 
-router.post('/border', function (req, res, next) {
+router.post('/border', function (req, res, next) {// 장바구니 주문하기
   var sess = req.session;
   pool.getConnection((err, conn) => {
     if (err) {
@@ -473,7 +581,6 @@ router.post('/border', function (req, res, next) {
     }
     var sql = 'insert into orders(oid, oday, oprice, oaddress, oname, otel, ocard, user_uid, user_cart) values(null, now(), ?, ?, ?, ?, ?, ?, ?)';
     conn.query(sql, [req.body.oprice, req.body.oaddress, req.body.oname, req.body.otel, req.body.ocard, sess.info.uid, sess.info.cart], function (err, row) {
-      conn.release();
       if (err) {
         throw err;
       }
@@ -484,7 +591,7 @@ router.post('/border', function (req, res, next) {
             throw err;
           }
           if (row.length !== 0) {
-            var sql = "insert into products_has_orders(orders_oid, products_pid, oamount) select LAST_INSERT_ID(), basket.products_pid, basket.bamount from baskter where basket.user_uid=? AND basket.user_cart=?";
+            var sql = "insert into products_has_orders(products_pid, orders_oid,opamount) select basket.products_pid, LAST_INSERT_ID(), basket.bamount from basket where basket.user_uid=? AND basket.user_cart=?";
             conn.query(sql, [sess.info.uid, sess.info.cart], function (err, result) {
               if (err) {
                 throw err;
@@ -492,6 +599,7 @@ router.post('/border', function (req, res, next) {
               if (result) {
                 var sql = "delete from basket where user_uid=? and user_cart = ?";
                 conn.query(sql, [sess.info.uid, sess.info.cart], function (err, result) {
+                  conn.release();
                   if (err) {
                     throw err;
                   }
@@ -510,7 +618,8 @@ router.post('/border', function (req, res, next) {
         });
       }
     });
-})});//받는 데이터
+  })
+});//받는 데이터
 
 
 router.post('/modify/:pid', function (req, res, next) { //수정하기

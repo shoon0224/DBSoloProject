@@ -32,8 +32,16 @@
             <div style="width: 50%; float: left;">
                 <h4>종류 : <%=data[i].pkind%></h4>
 
+                <% if(sess.info.urate == 'bronze'){%>
                 <h4>가격 : <%=data[i].pprice%></h4>
-
+                <% }%>
+                <% if(sess.info.urate == 'silver'){%>
+                <h4>가격 : <%=data[i].pprice*0.95%> <h3 style="color: red;">5% 할인되었습니다.</h3></h4>
+                <% }%>
+                <% if(sess.info.urate == 'vip'){%>
+                <h4>가격 : <%=data[i].pprice*0.90%> <h3 style="color: red;">10% 할인되었습니다.</h3></h4>
+                <% }%>
+                <h4>평점 : <%=data[i].prate%> </h4>
                 <% if(sess.info.master == 0) {%>
                 <h4>수량 : <input style="width: 200px; height: 30px;" type="number" name="opamount" min="1" max="100"
                         step="1" value="1" /></h4>

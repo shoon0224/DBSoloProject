@@ -16,20 +16,36 @@
           <% var opamount= parseInt(opamount); %>
           <form action="/order/<%= data[i].pid %>" method="POST">
         <tr>
-          <td><h3 style="margin-right: 100px;">상품 이름<%=data[i].pname%></h3></td>
+          <td>
+            <h3 style="margin-right: 100px;">상품 이름<%=data[i].pname%></h3>
+          </td>
         </tr>
         <tr>
-          <td><h3 style="margin-right: 100px;">수량</h3></td>
+          <td>
+            <h3 style="margin-right: 100px;">수량</h3>
+          </td>
           <td>
             <input type="text" name="opamount" size="30" maxlength="35" readonly="<%= opamount %>"
               value="<%= opamount %>">
           </td>
         </tr>
         <tr>
-          <td><h3 style="margin-right: 100px;">가격</h3></td>
           <td>
+            <h3 style="margin-right: 100px;">가격</h3>
+          </td>
+          <td>
+            <% if(sess.info.urate == 'bronze'){%>
             <input type="text" name="oprice" size="30" maxlength="35" readonly="<%=data[i].pprice * opamount %>"
               value="<%=data[i].pprice * opamount %>">
+            <%}%>
+              <% if(sess.info.urate == 'silver'){%>
+            <input type="text" name="oprice" size="30" maxlength="35" readonly="<%=data[i].pprice * opamount %>"
+              value="<%=data[i].pprice * opamount*0.95 %>">
+            <%}%>
+                  <% if(sess.info.urate == 'vip'){%>
+            <input type="text" name="oprice" size="30" maxlength="35" readonly="<%=data[i].pprice * opamount %>"
+              value="<%=data[i].pprice * opamount*0.90 %>">
+            <%}%>
           </td>
 
         </tr>
@@ -40,25 +56,33 @@
           </td>
         </tr>
         <tr>
-          <td><h3 style="margin-right: 100px;">수령인</h3></td>
+          <td>
+            <h3 style="margin-right: 100px;">수령인</h3>
+          </td>
           <td align=left>
             <input type="text" name="oname" size="30" maxlength="35">
           </td>
         </tr>
         <tr>
-          <td><h3 style="margin-right: 100px;">핸드폰</h3></td>
+          <td>
+            <h3 style="margin-right: 100px;">핸드폰</h3>
+          </td>
           <td align=left>
             <input type="text" name="otel" size="30" maxlength="35" value="<%=sess.info.otel%>">
           </td>
         </tr>
         <tr>
-          <td><h3 style="margin-right: 100px;">카드번호</h3></td>
+          <td>
+            <h3 style="margin-right: 100px;">카드번호</h3>
+          </td>
           <td align=left>
             <input type="text" name="ocard" size="30" maxlength="35">
           </td>
         </tr>
         <tr>
-          <td ><input style=" margin-top: 50px; width: 200px; height: 30px; background-color:black; border-radius: 10px; border:1px solid black; font-size: 15px; color:white;" type="submit" value="바로구매">
+          <td><input
+              style=" margin-top: 50px; width: 200px; height: 30px; background-color:black; border-radius: 10px; border:1px solid black; font-size: 15px; color:white;"
+              type="submit" value="바로구매">
           </td>
         </tr>
         </form>

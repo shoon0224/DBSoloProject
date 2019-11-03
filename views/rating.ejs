@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>Rate</title>
+</head>
+
+<body>
+    <center>
+        <h1>평점주기</h1>
+        <form action="/rating/<%=pid%>/<%=oid%>" method="POST">
+            <input type="number" name="porate" min="1" max="5" step="1" value="5" />
+            <input type="submit" value="평점매기기">
+        </form>
+    </center>
+</body>
+
+</html>
