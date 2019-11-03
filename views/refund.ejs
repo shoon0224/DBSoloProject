@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <center>
+        <h1>환불내역</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>주문번호</th>
+                    <th>환불번호</th>
+                    <th>책제목</th>
+                    <th>저자</th>
+                    <th>출판사</th>
+                    <th>환불가격</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--이거 data2는 orderlist에 data2로 select문을 추가해서 가져와주기 떄문에 쓸 수 있어-->
+                <%for(var i=0;i<data.length; i++) { %>
+                <tr>
+                    <td><%=data[i].orders_oid%></td>
+                    <td><%=data[i].rid%></td>
+                    <td><%=data[i].pname%></td>
+                    <td><%=data[i].pprice%></td>
+                    <td><%=data[i].pkind%></td>
+                    <td><%=data[i].orders_oprice%></td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </center>
+</body>
+
+</html>
