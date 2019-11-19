@@ -67,10 +67,6 @@ router.get('/registCom', function (req, res, next) { // 컴퓨터 등록화면
   res.render('index', { page: './registCom', sess: sess })
 });
 
-router.get('/mypage/:uid', function (req, res, next) { // 마이페이지
-  var sess = req.session
-  res.render('index', { page: './mypage', sess: sess })
-});
 
 router.get('/basket/:uid', function (req, res, next) { // 장바구니
   var sess = req.session
@@ -85,7 +81,7 @@ router.get('/detail/:pid', function (req, res, next) { //상품 상세보기
       throw err;
     }
     console.log("DB Connection");
-    var sql = "select pname, pprice, pkind, pexplan, pid, pimg, prate from products where pid = ?"
+    var sql = "select pname, pprice, pkind, pexplan, pid, pimg, prate, ppoint from products where pid = ?"
     conn.query(sql, [pid], function (err, row) {
       conn.release();
       if (err) {
@@ -94,6 +90,31 @@ router.get('/detail/:pid', function (req, res, next) { //상품 상세보기
       res.render('index', { page: './detail', data: row, sess: sess });
     });
   })
+});
+
+router.get('/review/:pid', function (req, res, next) { //뷰보기
+  var sess = req.session;
+  var pid = req.params.pid;
+  pool.getConnection((err, conn) => {
+    if (err) {
+      throw err;
+    }
+    console.log("DB Connection");
+    var sql = "select rwid, comment from review where products_pid = ?"
+    conn.query(sql, [pid], function (err, row) {
+      conn.release();
+      if (err) {
+        throw err;
+      }
+      res.render('index', { page: './review', data: row, sess: sess });
+    });
+  })
+});
+
+router.get('/registReview/:pid', function (req, res, next) { //리뷰작성 화면보기
+  var sess = req.session;
+  var pid = req.params.pid;
+      res.render('index', { page: './registReview', data:pid, sess: sess });
 });
 
 
@@ -164,7 +185,7 @@ router.post('/comBuy/:pid', function (req, res, next) {// 주문하기 화면
       throw err;
     }
     console.log("DB Connection");
-    var sql = "select pid,pname,pprice from products where pid = ?"
+    var sql = "select pid,pname,pprice,ppoint from products where pid = ?"
     conn.query(sql, [pid], function (err, row) {
       conn.release();
       if (err) {
@@ -174,8 +195,6 @@ router.post('/comBuy/:pid', function (req, res, next) {// 주문하기 화면
     });
   })
 });
-
-
 
 
 
@@ -191,7 +210,7 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
       throw err;
     }
     var sql = 'insert into orders(oid, oday, oprice, oaddress, oname, ocard, otel, user_uid, user_cart) values(null, now(), ?, ?, ?, ?, ?, ?, ?)';
-    conn.query(sql, [req.body.oprice, req.body.oaddress, req.body.oname, req.body.otel, req.body.ocard, sess.info.uid, sess.info.cart], function (err, row) {
+    conn.query(sql, [req.body.oprice, req.body.oaddress, req.body.oname, req.body.otel, req.body.ocard, sess.info.uid, sess.info.cart, sess.info.upoint], function (err, row) {
       if (err) {
         throw err;
       }
@@ -216,6 +235,7 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
                   if (row[0].sum >= 5000000 && row[0].sum < 10000000) {
                     var sql = "update user set urate = 'silver' where uid = ?"
                     conn.query(sql, [sess.info.uid], function (err, row) {
+                      conn.release();
                       if (err) {
                         throw err;
                       }
@@ -229,9 +249,11 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
                   if (row[0].sum >= 10000000) {
                     var sql = "update user set urate = 'vip' where uid = ?"
                     conn.query(sql, [sess.info.uid], function (err, row) {
+                      conn.release();
                       if (err) {
                         throw err;
                       }
+                      
                       if (result) {
                         sess.info = row[0];
                         res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
@@ -239,6 +261,18 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
                       }
                     })
                   }
+                  
+                  var sql = "select ppoint from product where pid = ? "
+                  conn.query(sql, [sess.info.uid], function(err, row){
+                    if(err){
+                      throw err;
+                    }
+                    if (result) {
+                      sess.info = row[0];
+                      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+                      res.write("<script>alert('주문이 완료되었습니다.');location.href='/';</script>")
+                    }
+                  })
                 });
               }
               else {
@@ -327,6 +361,35 @@ router.post('/rating/:pid/:oid', function (req, res, next) { //평점주기
 
 
 
+router.post('/registReview/:pid', function (req, res, next) { //리뷰등록
+  var sess = req.session;
+  var pid = req.params.pid;
+
+  pool.getConnection((err, conn) => {
+    if (err) {
+      throw err;
+    }
+    console.log("DB Connection");
+    var sql = "insert into review values(null,?,?,?,?)";
+    conn.query(sql, [req.body.comment,sess.info.uid,sess.info.cart, pid], function (err, row) {
+      if (err) {
+        throw err;
+      }
+      if (row) {
+        sess.info = row[0];
+        res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+        res.write("<script>alert('리뷰가 등록되었습니다.');location.href='/';</script>")
+      }
+    })
+  }
+  )})
+
+
+
+
+
+
+
 router.post('/refund/:oid', function (req, res, next) { //환불하기
   var sess = req.session;
   var oid = req.params.oid;
@@ -351,6 +414,7 @@ router.post('/refund/:oid', function (req, res, next) { //환불하기
             if (result) {
               var sql = "delete from orders where oid=?";
               conn.query(sql, [oid], function (err, result) {
+                conn.release();
                 if (err) {
                   throw err;
                 }
@@ -383,6 +447,7 @@ router.get('/refund', function (req, res, next) { //환불내역
     console.log("DB Connection");
     var sql = "select refund.*, products.* from refund,products where refund.orders_pid=products.pid and refund.user_uid=?"
     conn.query(sql, [sess.info.uid], function (err, row) {
+      conn.release();
       if (err) {
         throw err;
       }
@@ -532,8 +597,8 @@ router.post('/registCom', upload.single('photo'), function (req, res, next) {//�
         throw err;
       }
       else if (row.length === 0) {
-        var sql = "insert into products(pid, pname, pprice, pkind, pexplan, pimg) values (?, ?, ?, ?, ?, ?)";
-        conn.query(sql, [req.body.pid, req.body.pname, req.body.pprice, req.body.pkind, req.body.pexplan, imgurl], function (err, result) {
+        var sql = "insert into products(pid, pname, pprice, pkind, pexplan, pimg, ppoint) values (?, ?, ?, ?, ?, ?, ?)";
+        conn.query(sql, [req.body.pid, req.body.pname, req.body.pprice, req.body.pkind, req.body.pexplan, imgurl, req.body.ppoint], function (err, result) {
           conn.release();
           if (err) {
             res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
