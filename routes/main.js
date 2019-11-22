@@ -262,7 +262,7 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
                     })
                   }
                   
-                  var sql = "select ppoint from product where pid = ? "
+                  var sql = "select ppoint from product where = pid"
                   conn.query(sql, [sess.info.uid], function(err, row){
                     if(err){
                       throw err;
