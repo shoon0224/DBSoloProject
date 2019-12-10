@@ -3,18 +3,17 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>리뷰</title>
+    <title>환불</title>
 </head>
 
 <body>
     <center>
-        <h1>상품리뷰</h1>
+        <h1>환불사유</h1>
         <%for(var i=0;i<data.length; i++) { %>
         <form action="/review/<%= data[i].pid %>" method="POST" style="width: 100%; height: 1000px;">
             <p><%=data[i].comment%></p>
-            </div>
             <%}%>
-        </div>
+
     </form>
 </center>
 </body>

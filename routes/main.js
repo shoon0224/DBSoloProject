@@ -92,7 +92,7 @@ router.get('/detail/:pid', function (req, res, next) { //상품 상세보기
   })
 });
 
-router.get('/review/:pid', function (req, res, next) { //뷰보기
+router.get('/review/:pid', function (req, res, next) { //리뷰보기
   var sess = req.session;
   var pid = req.params.pid;
   pool.getConnection((err, conn) => {
@@ -262,17 +262,7 @@ router.post('/order/:pid', function (req, res, next) { //주문하기
                     })
                   }
                   
-                  var sql = "select ppoint from product where = pid"
-                  conn.query(sql, [sess.info.uid], function(err, row){
-                    if(err){
-                      throw err;
-                    }
-                    if (result) {
-                      sess.info = row[0];
-                      res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-                      res.write("<script>alert('주문이 완료되었습니다.');location.href='/';</script>")
-                    }
-                  })
+                  
                 });
               }
               else {
@@ -398,12 +388,13 @@ router.post('/refund/:oid', function (req, res, next) { //환불하기
       throw err;
     }
     console.log("DB Connection");
-
-    var sql = "insert into refund(orders_oid,orders_pid,orders_oday,orders_oprice,orders_oamount,user_uid) select orders.oid,products_has_orders.products_pid,orders.oday,orders.oprice,products_has_orders.opamount,orders.user_uid from orders,products_has_orders where orders.oid=? and products_has_orders.orders_oid=?";
+//아래는 환불내역에 넣을 환불 정보들
+    var sql = "insert into refund(orders_oid, orders_pid,orders_oday, orders_oprice, orders_oamount, user_uid) select orders.oid, products_has_orders.products_pid, orders.oday, orders.oprice, products_has_orders.opamount, orders.user_uid from orders, products_has_orders where orders.oid=? and products_has_orders.orders_oid=?";
     conn.query(sql, [oid, oid], function (err, result) {
       if (err) {
         throw err;
       }
+      //환불후 삭제할 내역들
       if (result) {
         var sql = "delete from products_has_orders where orders_oid= ?";
         conn.query(sql, [oid], function (err, result) {

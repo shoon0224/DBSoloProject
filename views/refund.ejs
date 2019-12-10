@@ -29,6 +29,14 @@
                     <td><%=data[i].pprice%></td>
                     <td><%=data[i].pkind%></td>
                     <td><%=data[i].orders_oprice%></td>
+                    <td>
+                        <form action="whyRefund/<%=data%>">
+                            <textarea id="comment" name="comment" cols=30 rows=5></textarea>
+                            <td><input style="width: 100px; height: 30px; background-color:black; border-radius: 10px; border:1px solid black; font-size: 15px; color:white;"
+                                 type="submit" value="생성"></td>
+                        </form>
+                    </td>
+                    <td><%=data[i].w_refund%></td>
                 </tr>
                 <% } %>
             </tbody>
