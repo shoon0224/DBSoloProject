@@ -62,6 +62,11 @@ router.get('/join', function (req, res, next) { // 회원가입화면
   res.render('index', { page: './join', sess: sess })
 });
 
+router.get('/bpoint', function (req, res, next) {//bpoint충전화면
+  var sess = req.session;
+  res.render('index', { page: './bpoint', sess: sess })
+});
+
 router.get('/registCom', function (req, res, next) { // 컴퓨터 등록화면
   var sess = req.session
   res.render('index', { page: './registCom', sess: sess })
@@ -571,6 +576,27 @@ router.post('/inquire', function (req, res, next) { //검색
 })
 
 
+router.post('/bpoint', function (req, res, next) {//bpoint
+  var sess = req.session;
+  pool.getConnection(function (err, conn) {
+    if (err) {
+      throw err;
+    }
+      if (row.length === 0) {
+        var sql = "update user set uid = ? ubpoint = ?";
+        conn.query(sql, [req.body.uid, req.body.ubpoint], function (err, row) {
+          conn.release();
+          if (err) {
+            throw err;
+          }
+          res.render("index", { page: './mypage', sess: sess }); // 회원가입 완료후 로그인 화면으로 이동
+        });
+      }
+      else {
+        res.send("<script>alert('중복된 아이디입니다.');history.back();</script>"); // 아이디가 중복된 아이디로 가입시도시 알럿 표시
+      }
+  })
+});
 
 
 
